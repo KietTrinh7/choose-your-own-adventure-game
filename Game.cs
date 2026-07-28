@@ -55,7 +55,11 @@ public class Game
                     }
                     else if (selectedPath == "south")
                     {
-                        Console.WriteLine(messages.GetMessage("south_path_narrative"));
+                        Merchant merchant = new Merchant(die);
+                        if (merchant.RollEncounter())
+                            RunMerchantShop(player, merchant, messages);
+                        else
+                            Console.WriteLine(messages.GetMessage("south_path_narrative"));
                     }
                     else if (selectedPath == "north")
                     {
@@ -131,6 +135,127 @@ public class Game
 
             Console.WriteLine(messages.GetMessage("path_invalid"));
         }
+    }
+
+    // Wandering Merchant shop. All shop rules live in Merchant; this loop
+    // only reads input and prints localized text (see ADR-0002).
+    private void RunMerchantShop(Player player, Merchant merchant, Messages messages)
+    {
+        Console.WriteLine(messages.GetMessage("merchant_appears"));
+        Console.WriteLine(messages.GetMessage("merchant_greeting"));
+
+        while (true)
+        {
+            Console.WriteLine(string.Format(messages.GetMessage("shop_gold"), player.Gold));
+
+            // Menu numbers are assigned dynamically so only in-stock items appear.
+            var actions = new List<string>();
+            if (merchant.OffersEnchantedSword(player))
+            {
+                actions.Add("sword");
+                Console.WriteLine(string.Format(messages.GetMessage("shop_option_sword"), actions.Count));
+            }
+            if (merchant.OffersEnchantedArmor(player))
+            {
+                actions.Add("armor");
+                Console.WriteLine(string.Format(messages.GetMessage("shop_option_armor"), actions.Count));
+            }
+            if (merchant.CanSellWeapon(player))
+            {
+                actions.Add("sell");
+                Console.WriteLine(string.Format(
+                    messages.GetMessage("shop_option_sell"),
+                    actions.Count,
+                    messages.TranslateWeaponForDisplay(player.Weapon!.Type),
+                    player.Weapon.MaxDamage));
+            }
+            actions.Add("leave");
+            Console.WriteLine(string.Format(messages.GetMessage("shop_option_leave"), actions.Count));
+
+            Console.Write(messages.GetMessage("enter_choice"));
+            string? input = Console.ReadLine()?.Trim();
+            if (!int.TryParse(input, out int choice) || choice < 1 || choice > actions.Count)
+            {
+                Console.WriteLine(messages.GetMessage("shop_invalid"));
+                continue;
+            }
+
+            string action = actions[choice - 1];
+            if (action == "leave")
+            {
+                Console.WriteLine(messages.GetMessage("merchant_farewell"));
+                return;
+            }
+
+            if (action == "sell")
+            {
+                string soldWeapon = messages.TranslateWeaponForDisplay(player.Weapon!.Type);
+                int credited = merchant.SellWeapon(player);
+                Console.WriteLine(string.Format(messages.GetMessage("sell_success"), soldWeapon, credited));
+                continue;
+            }
+
+            if (action == "sword")
+            {
+                // A weapon purchase discards the current weapon: warn first.
+                string currentWeapon = messages.TranslateWeaponForDisplay(player.Weapon!.Type);
+                if (!AskYesNo(string.Format(messages.GetMessage("weapon_discard_warning"), currentWeapon), messages))
+                {
+                    Console.WriteLine(messages.GetMessage("buy_cancelled"));
+                    continue;
+                }
+            }
+
+            // Optional Haggle before paying: success takes 10 Gold off this
+            // item; failure ends the entire encounter (nothing bought).
+            int price = Merchant.Price;
+            if (AskYesNo(messages.GetMessage("haggle_prompt"), messages))
+            {
+                bool bargainStruck = merchant.Haggle(player, out int roll);
+                Console.WriteLine(string.Format(messages.GetMessage("haggle_roll"), roll, player.Agility));
+                if (bargainStruck)
+                {
+                    price -= Merchant.HaggleDiscount;
+                    Console.WriteLine(messages.GetMessage("haggle_success"));
+                }
+                else
+                {
+                    Console.WriteLine(messages.GetMessage("haggle_fail"));
+                    return;
+                }
+            }
+
+            if (action == "sword")
+            {
+                PurchaseOutcome outcome = merchant.BuyEnchantedSword(player, price);
+                ReportPurchase(outcome, messages.TranslateWeaponForDisplay(Merchant.EnchantedSwordType), price, messages);
+            }
+            else
+            {
+                PurchaseOutcome outcome = merchant.BuyEnchantedArmor(player, price);
+                ReportPurchase(outcome, messages.TranslateArmorForDisplay(Merchant.EnchantedArmorType), price, messages);
+            }
+        }
+    }
+
+    private bool AskYesNo(string prompt, Messages messages)
+    {
+        while (true)
+        {
+            Console.WriteLine(prompt);
+            string? answer = Console.ReadLine()?.Trim().ToLower();
+            if (answer == "y") return true;
+            if (answer == "n") return false;
+            Console.WriteLine(messages.GetMessage("invalid"));
+        }
+    }
+
+    private void ReportPurchase(PurchaseOutcome outcome, string itemName, int price, Messages messages)
+    {
+        if (outcome == PurchaseOutcome.Purchased)
+            Console.WriteLine(string.Format(messages.GetMessage("buy_success"), price, itemName));
+        else if (outcome == PurchaseOutcome.InsufficientGold)
+            Console.WriteLine(string.Format(messages.GetMessage("buy_insufficient"), price));
     }
 
     private void HandleDragonEncounter(Player player, Dragon dragon, Messages messages)
