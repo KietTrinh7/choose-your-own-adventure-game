@@ -10,7 +10,18 @@ public class Player
     public int Agility { get; set; }
     public int HealthPoints { get; set; }
 
+    public int Gold { get; set; } = 50;
     public Weapon? Weapon { get; set; }
+    public Armor? Armor { get; set; }
+
+    // Applies armor Protection to incoming damage: max(0, raw - Protection).
+    // With no armor equipped, damage passes through unchanged.
+    public int ReduceDamage(int rawDamage)
+    {
+        if (Armor == null)
+            return rawDamage;
+        return Math.Max(0, rawDamage - Armor.Protection);
+    }
 
     public void CreateCharacter(Messages messages)
     {
@@ -151,6 +162,17 @@ public class Player
             Console.WriteLine(messages.GetMessage("stats_weapon") + messages.TranslateWeaponForDisplay(Weapon.Type));
             Console.WriteLine(messages.GetMessage("stats_damage") + Weapon.MaxDamage);
         }
+
+        Console.WriteLine(messages.GetMessage("stats_gold") + Gold);
+        Console.WriteLine(messages.GetMessage("stats_armor") + GetArmorDisplay(messages));
+    }
+
+    public string GetArmorDisplay(Messages messages)
+    {
+        if (Armor == null)
+            return messages.GetMessage("armor_none");
+        return string.Format(messages.GetMessage("armor_display"),
+            messages.TranslateArmorForDisplay(Armor.Type), Armor.Protection);
     }
 
     public int RollAttack()

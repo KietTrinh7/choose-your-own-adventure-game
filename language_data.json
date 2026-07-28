@@ -69,7 +69,30 @@
       "dragon_damage_reply_2": "Impressive! You might actually be worth toasting...",
       "dragon_damage_reply_3": "That... was unexpected. But I assure you, it won't happen again.",
       "dragon_damage_reply_4": "Well, I'll be! You have more bite than I thought!",
-      "enter_choice": "Enter choice: "
+      "enter_choice": "Enter choice: ",
+      "stats_gold": "Gold: ",
+      "stats_armor": "Armor: ",
+      "armor_none": "none",
+      "armor_display": "{0} (Protection {1})",
+      "armor_absorbs": "Your {0} absorbs {1} points of the blow!",
+      "merchant_appears": "You take the South path. Among the trees, a figure with a heavy pack waves you down — a Wandering Merchant!",
+      "merchant_greeting": "\"Ah, a traveler! Fate smiles on us both. I carry rare goods — enchanted steel and armor touched by magic. Care to see my wares?\"",
+      "shop_gold": "You have {0} Gold.",
+      "shop_option_sword": "{0}. Buy the Enchanted Sword — 30 Gold (Max Damage 16)",
+      "shop_option_armor": "{0}. Buy the Enchanted Armor — 30 Gold (Protection 3)",
+      "shop_option_sell": "{0}. Sell your {1} — {2} Gold",
+      "shop_option_leave": "{0}. Leave",
+      "shop_invalid": "Please choose one of the listed options.",
+      "weapon_discard_warning": "The Enchanted Sword will replace your {0} — your old weapon is discarded with no refund. Buy it? Type 'y' or 'n'",
+      "buy_cancelled": "You step back from the deal. The merchant shrugs amiably.",
+      "buy_success": "You hand over {0} Gold and take the {1}. You equip it at once.",
+      "buy_insufficient": "The merchant smiles apologetically. \"Alas, that costs {0} Gold, friend. Come back when your purse is heavier.\"",
+      "merchant_farewell": "The merchant tips his hat. \"Safe travels, friend!\" You head back to the mountain paths.",
+      "sell_success": "The merchant weighs your {0} and counts out {1} Gold. You are left fighting with your fists.",
+      "haggle_prompt": "Care to haggle for 10 Gold off? One roll of the die, at or under your Agility — but fail, and you'll insult him. Type 'y' or 'n'",
+      "haggle_roll": "You roll a {0} against your Agility of {1}.",
+      "haggle_success": "\"You drive a hard bargain!\" The merchant knocks 10 Gold off.",
+      "haggle_fail": "The merchant's face darkens. \"You insult me! Our business is done.\" He shoulders his pack and disappears among the trees."
     },
     "raceMap": {
       "human": "Human",
@@ -100,7 +123,12 @@
       "lightning bolt spell": "lightning bolt spell",
       "dagger": "dagger",
       "long bow": "long bow",
-      "claws": "claws"
+      "claws": "claws",
+      "enchanted sword": "enchanted sword",
+      "fists": "fists"
+    },
+    "displayArmorMap": {
+      "enchanted armor": "enchanted armor"
     }
   },
   "Spanish": {
@@ -173,7 +201,30 @@
       "dragon_damage_reply_2": "Impresionante! Tal vez realmente valga la pena tostarte...",
       "dragon_damage_reply_3": "Eso... fue inesperado. Pero te aseguro que no volvera a pasar.",
       "dragon_damage_reply_4": "Vaya! Tienes mas fuerza de la que pensaba!",
-      "enter_choice": "Escribe tu opcion: "
+      "enter_choice": "Escribe tu opcion: ",
+      "stats_gold": "Oro: ",
+      "stats_armor": "Armadura: ",
+      "armor_none": "ninguna",
+      "armor_display": "{0} (Protección {1})",
+      "armor_absorbs": "¡Tu {0} absorbe {1} puntos del golpe!",
+      "merchant_appears": "Tomas el camino Sur. Entre los árboles, una figura con una mochila pesada te hace señas: ¡un Mercader Errante!",
+      "merchant_greeting": "\"¡Ah, un viajero! El destino nos sonríe a ambos. Llevo mercancías raras: acero encantado y armadura tocada por la magia. ¿Quieres ver mis mercancías?\"",
+      "shop_gold": "Tienes {0} de Oro.",
+      "shop_option_sword": "{0}. Comprar la Espada Encantada — 30 de Oro (Daño Máximo 16)",
+      "shop_option_armor": "{0}. Comprar la Armadura Encantada — 30 de Oro (Protección 3)",
+      "shop_option_sell": "{0}. Vender tu {1} — {2} de Oro",
+      "shop_option_leave": "{0}. Irse",
+      "shop_invalid": "Por favor elige una de las opciones de la lista.",
+      "weapon_discard_warning": "La Espada Encantada reemplazará tu {0}: tu arma anterior se descarta sin reembolso. ¿Comprarla? Escribe 'y' o 'n'",
+      "buy_cancelled": "Te retiras del trato. El mercader se encoge de hombros amablemente.",
+      "buy_success": "Entregas {0} de Oro y tomas la {1}. Te la equipas de inmediato.",
+      "buy_insufficient": "El mercader sonríe disculpándose. \"Lamentablemente, eso cuesta {0} de Oro, amigo. Vuelve cuando tu bolsa pese más.\"",
+      "merchant_farewell": "El mercader se quita el sombrero. \"¡Buen viaje, amigo!\" Regresas a los senderos de la montaña.",
+      "sell_success": "El mercader sopesa tu {0} y cuenta {1} de Oro. Te quedas luchando con los puños.",
+      "haggle_prompt": "¿Quieres regatear 10 de Oro de descuento? Una tirada del dado, igual o menor que tu Agilidad; pero si fallas, lo insultarás. Escribe 'y' o 'n'",
+      "haggle_roll": "Sacas un {0} contra tu Agilidad de {1}.",
+      "haggle_success": "\"¡Sabes negociar!\" El mercader rebaja 10 de Oro.",
+      "haggle_fail": "El rostro del mercader se ensombrece. \"¡Me insultas! Nuestro negocio ha terminado.\" Se echa la mochila al hombro y desaparece entre los árboles."
     },
     "raceMap": {
       "humano": "Human",
@@ -204,7 +255,12 @@
       "lightning bolt spell": "hechizo de rayo",
       "dagger": "daga",
       "long bow": "arco largo",
-      "claws": "garras"
+      "claws": "garras",
+      "enchanted sword": "espada encantada",
+      "fists": "puños"
+    },
+    "displayArmorMap": {
+      "enchanted armor": "armadura encantada"
     }
   },
   "French": {
@@ -277,7 +333,30 @@
       "dragon_damage_reply_2": "Impressionnant! Tu vaux peut-etre vraiment la peine d'etre grille...",
       "dragon_damage_reply_3": "C'etait... inattendu. Mais je t'assure que cela ne se reproduira pas.",
       "dragon_damage_reply_4": "Eh bien! Tu as plus de mordant que je ne le pensais!",
-      "enter_choice": "Entrez votre choix : "
+      "enter_choice": "Entrez votre choix : ",
+      "stats_gold": "Or: ",
+      "stats_armor": "Armure: ",
+      "armor_none": "aucune",
+      "armor_display": "{0} (Protection {1})",
+      "armor_absorbs": "Votre {0} absorbe {1} points du coup!",
+      "merchant_appears": "Vous prenez le chemin du Sud. Parmi les arbres, une silhouette au lourd sac vous fait signe — un Marchand Errant!",
+      "merchant_greeting": "\"Ah, un voyageur! Le destin nous sourit à tous les deux. Je porte des marchandises rares — de l'acier enchanté et une armure touchée par la magie. Voulez-vous voir mes trésors?\"",
+      "shop_gold": "Vous avez {0} pièces d'Or.",
+      "shop_option_sword": "{0}. Acheter l'Épée Enchantée — 30 pièces d'Or (Dégâts Maximum 16)",
+      "shop_option_armor": "{0}. Acheter l'Armure Enchantée — 30 pièces d'Or (Protection 3)",
+      "shop_option_sell": "{0}. Vendre votre {1} — {2} pièces d'Or",
+      "shop_option_leave": "{0}. Partir",
+      "shop_invalid": "Veuillez choisir une des options de la liste.",
+      "weapon_discard_warning": "L'Épée Enchantée remplacera votre {0} — votre ancienne arme est jetée sans remboursement. L'acheter? Tapez 'y' ou 'n'",
+      "buy_cancelled": "Vous renoncez au marché. Le marchand hausse les épaules aimablement.",
+      "buy_success": "Vous remettez {0} pièces d'Or et prenez {1}. Vous l'équipez aussitôt.",
+      "buy_insufficient": "Le marchand sourit d'un air désolé. \"Hélas, cela coûte {0} pièces d'Or, l'ami. Revenez quand votre bourse sera plus lourde.\"",
+      "merchant_farewell": "Le marchand soulève son chapeau. \"Bonne route, l'ami!\" Vous retournez vers les sentiers de la montagne.",
+      "sell_success": "Le marchand soupèse votre {0} et compte {1} pièces d'Or. Vous voilà réduit à combattre à poings nus.",
+      "haggle_prompt": "Voulez-vous marchander 10 pièces d'Or de rabais? Un lancer de dé, égal ou inférieur à votre Agilité — mais si vous échouez, vous l'insulterez. Tapez 'y' ou 'n'",
+      "haggle_roll": "Vous obtenez {0} contre votre Agilité de {1}.",
+      "haggle_success": "\"Vous négociez dur!\" Le marchand baisse le prix de 10 pièces d'Or.",
+      "haggle_fail": "Le visage du marchand s'assombrit. \"Vous m'insultez! Notre affaire est terminée.\" Il remet son sac à l'épaule et disparaît parmi les arbres."
     },
     "raceMap": {
       "humain": "Human",
@@ -308,7 +387,12 @@
       "lightning bolt spell": "sort d'eclair",
       "dagger": "dague",
       "long bow": "arc long",
-      "claws": "griffes"
+      "claws": "griffes",
+      "enchanted sword": "épée enchantée",
+      "fists": "poings"
+    },
+    "displayArmorMap": {
+      "enchanted armor": "armure enchantée"
     }
   },
   "Italian": {
@@ -381,7 +465,30 @@
       "dragon_damage_reply_2": "Impressionante! Forse vale davvero la pena arrostirti...",
       "dragon_damage_reply_3": "Questo... era inaspettato. Ma ti assicuro che non succedera di nuovo.",
       "dragon_damage_reply_4": "Caspita! Hai piu mordente di quanto pensassi!",
-      "enter_choice": "Inserisci la tua scelta: "
+      "enter_choice": "Inserisci la tua scelta: ",
+      "stats_gold": "Oro: ",
+      "stats_armor": "Armatura: ",
+      "armor_none": "nessuna",
+      "armor_display": "{0} (Protezione {1})",
+      "armor_absorbs": "La tua {0} assorbe {1} punti del colpo!",
+      "merchant_appears": "Prendi il sentiero del Sud. Tra gli alberi, una figura con un pesante zaino ti fa cenno: un Mercante Errante!",
+      "merchant_greeting": "\"Ah, un viaggiatore! Il destino sorride a entrambi. Porto merci rare — acciaio incantato e un'armatura toccata dalla magia. Vuoi vedere la mia mercanzia?\"",
+      "shop_gold": "Hai {0} monete d'Oro.",
+      "shop_option_sword": "{0}. Compra la Spada Incantata — 30 monete d'Oro (Danno Massimo 16)",
+      "shop_option_armor": "{0}. Compra l'Armatura Incantata — 30 monete d'Oro (Protezione 3)",
+      "shop_option_sell": "{0}. Vendi la tua {1} — {2} monete d'Oro",
+      "shop_option_leave": "{0}. Vattene",
+      "shop_invalid": "Per favore scegli una delle opzioni elencate.",
+      "weapon_discard_warning": "La Spada Incantata sostituirà la tua {0} — la tua vecchia arma viene scartata senza rimborso. Comprarla? Digita 'y' o 'n'",
+      "buy_cancelled": "Rinunci all'affare. Il mercante alza le spalle amichevolmente.",
+      "buy_success": "Consegni {0} monete d'Oro e prendi {1}. Lo equipaggi subito.",
+      "buy_insufficient": "Il mercante sorride dispiaciuto. \"Ahimè, costa {0} monete d'Oro, amico. Torna quando la tua borsa sarà più pesante.\"",
+      "merchant_farewell": "Il mercante si toglie il cappello. \"Buon viaggio, amico!\" Torni ai sentieri di montagna.",
+      "sell_success": "Il mercante soppesa la tua {0} e conta {1} monete d'Oro. Ti ritrovi a combattere a mani nude.",
+      "haggle_prompt": "Vuoi contrattare per uno sconto di 10 monete d'Oro? Un lancio di dado, pari o inferiore alla tua Agilità — ma se fallisci, lo insulterai. Digita 'y' o 'n'",
+      "haggle_roll": "Ottieni {0} contro la tua Agilità di {1}.",
+      "haggle_success": "\"Sai contrattare!\" Il mercante sconta 10 monete d'Oro.",
+      "haggle_fail": "Il volto del mercante si oscura. \"Mi insulti! I nostri affari sono finiti.\" Si rimette lo zaino in spalla e scompare tra gli alberi."
     },
     "raceMap": {
       "umano": "Human",
@@ -412,7 +519,12 @@
       "lightning bolt spell": "incantesimo del fulmine",
       "dagger": "pugnale",
       "long bow": "arco lungo",
-      "claws": "artigli"
+      "claws": "artigli",
+      "enchanted sword": "spada incantata",
+      "fists": "pugni"
+    },
+    "displayArmorMap": {
+      "enchanted armor": "armatura incantata"
     }
   }
 }
