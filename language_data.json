@@ -2,6 +2,10 @@
   "English": {
     "dictionary": {
       "welcome": "Welcome to Choose Your Adventure Game",
+      "profile_menu": "Choose; 1. New Game or 2. Continue. Type '1' or '2'",
+      "profile_select_prompt": "Which character will you continue?",
+      "profile_option": "{0}. {1}",
+      "profile_resumed": "Welcome back, {0}. Your adventure continues.",
       "menu": "Choose; 1. Create Character or 2. Exit. Type '1' or '2'",
       "choose_path": "Choose a path:",
       "path_north": "1. North",
@@ -134,6 +138,10 @@
   "Spanish": {
     "dictionary": {
       "welcome": "Bienvenido al Juego de Elige Tu Aventura",
+      "profile_menu": "Elige; 1. Partida Nueva o 2. Continuar. Escribe '1' o '2'",
+      "profile_select_prompt": "¿Que personaje quieres continuar?",
+      "profile_option": "{0}. {1}",
+      "profile_resumed": "Bienvenido de nuevo, {0}. Tu aventura continua.",
       "menu": "Elige; 1. Crear Personaje o 2. Salir. Escribe '1' o '2'",
       "choose_path": "Elige un camino:",
       "path_north": "1. Norte",
@@ -266,6 +274,10 @@
   "French": {
     "dictionary": {
       "welcome": "Bienvenue dans Choisissez Votre Aventure",
+      "profile_menu": "Choisissez; 1. Nouvelle Partie ou 2. Continuer. Tapez '1' ou '2'",
+      "profile_select_prompt": "Quel personnage voulez-vous continuer?",
+      "profile_option": "{0}. {1}",
+      "profile_resumed": "Bon retour, {0}. Votre aventure continue.",
       "menu": "Choisissez; 1. Creer un Personnage ou 2. Quitter. Tapez '1' ou '2'",
       "choose_path": "Choisissez un chemin:",
       "path_north": "1. Nord",
@@ -398,6 +410,10 @@
   "Italian": {
     "dictionary": {
       "welcome": "Benvenuto nel Gioco Scegli la Tua Avventura",
+      "profile_menu": "Scegli; 1. Nuova Partita o 2. Continua. Digita '1' o '2'",
+      "profile_select_prompt": "Quale personaggio vuoi continuare?",
+      "profile_option": "{0}. {1}",
+      "profile_resumed": "Bentornato, {0}. La tua avventura continua.",
       "menu": "Scegli; 1. Crea Personaggio o 2. Esci. Digita '1' o '2'",
       "choose_path": "Scegli un sentiero:",
       "path_north": "1. Nord",

@@ -41,3 +41,17 @@ _Avoid_: Unarmed, bare hands
 **Encounter Roll**:
 The d20 roll made when the player goes South: 16–20 means a Wandering Merchant appears; otherwise the uneventful woods.
 _Avoid_: Spawn chance, random event
+
+### Save profiles
+
+**Profile**:
+One saved character, identified by the name given at character creation. Holds the whole character and nothing else: no dragon, no path history, no purchase log.
+_Avoid_: Save, savegame, save file, slot, checkpoint
+
+**Autosave**:
+The automatic write of the current Profile that happens every time the player returns to the adventure menu. There is no save command.
+_Avoid_: Quicksave, save point
+
+**Profile store**:
+The single JSON document under the player's local application data holding every Profile, keyed by character name.
+_Avoid_: Database, save folder

@@ -24,6 +24,8 @@ public class Game
         Messages messages = new Messages();
         messages.SetCurrentLanguage(selectedLanguage);
         messages.ReadDictionary();
+
+        ProfileStore profiles = new ProfileStore(ProfileStore.DefaultDirectory);
         // Display welcome message
         Console.WriteLine();
         Console.WriteLine(messages.GetMessage("welcome"));
@@ -39,12 +41,15 @@ public class Game
 
             if (choice == "1")
             {
-                Player player = new Player();
-                player.CreateCharacter(messages);
+                Player player = StartOrResumeCharacter(profiles, messages);
 
                 bool inAdventureMenu = true;
                 while (inAdventureMenu)
                 {
+                    // Autosave: the adventure menu is a quiescent state, so no
+                    // encounter is ever mid-flight when the Profile is written.
+                    profiles.Save(player);
+
                     string selectedPath = PromptForPath(messages);
 
                     if (selectedPath == "exit")
@@ -79,6 +84,60 @@ public class Game
             {
                 Console.WriteLine(messages.GetMessage("invalid"));
             }
+        }
+    }
+
+    // Offers Continue only when a Profile exists, so a first-time player sees
+    // exactly the flow the game had before Profiles existed.
+    private Player StartOrResumeCharacter(ProfileStore profiles, Messages messages)
+    {
+        List<string> names = profiles.ListNames();
+
+        if (names.Count > 0 && PlayerChoseContinue(messages))
+        {
+            Player? resumed = PromptForProfile(profiles, names, messages);
+            if (resumed != null)
+            {
+                Console.WriteLine(string.Format(messages.GetMessage("profile_resumed"), resumed.Name));
+                return resumed;
+            }
+        }
+
+        Player player = new Player();
+        player.CreateCharacter(messages);
+        return player;
+    }
+
+    private bool PlayerChoseContinue(Messages messages)
+    {
+        while (true)
+        {
+            Console.WriteLine(messages.GetMessage("profile_menu"));
+            Console.Write(messages.GetMessage("enter_choice"));
+            string? input = Console.ReadLine()?.Trim();
+
+            if (input == "1") return false;
+            if (input == "2") return true;
+
+            Console.WriteLine(messages.GetMessage("invalid"));
+        }
+    }
+
+    private Player? PromptForProfile(ProfileStore profiles, List<string> names, Messages messages)
+    {
+        while (true)
+        {
+            Console.WriteLine(messages.GetMessage("profile_select_prompt"));
+            for (int i = 0; i < names.Count; i++)
+                Console.WriteLine(string.Format(messages.GetMessage("profile_option"), i + 1, names[i]));
+
+            Console.Write(messages.GetMessage("enter_choice"));
+            string? input = Console.ReadLine()?.Trim();
+
+            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= names.Count)
+                return profiles.Load(names[choice - 1]);
+
+            Console.WriteLine(messages.GetMessage("invalid"));
         }
     }
 
