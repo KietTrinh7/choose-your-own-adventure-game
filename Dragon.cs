@@ -1,4 +1,4 @@
-public class Dragon
+public class Dragon : IMonster
 {
     private readonly Die _die;
 
@@ -129,6 +129,11 @@ public class Dragon
     {
         int index = _die.Roll(_damageReplyKeys.Count) - 1;
         return messages.GetMessage(_damageReplyKeys[index]);
+    }
+
+    public string GetDefeatedNarrative(Messages messages)
+    {
+        return messages.GetMessage("dragon_defeated_narrative");
     }
 
     public void DisplayStats(Messages messages)

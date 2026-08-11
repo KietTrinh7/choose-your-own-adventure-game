@@ -221,7 +221,7 @@ public class Player
         return _die.Roll(Weapon.MaxDamage);
     }
 
-    public string Attack(Dragon dragon, Messages messages)
+    public string Attack(IMonster dragon, Messages messages)
     {
         if (Weapon == null)
             return "You have no weapon to attack with.";
@@ -270,7 +270,7 @@ public class Player
 
         // END
         if (dragon.HealthPoints <= 0)
-            output.Add(messages.GetMessage("dragon_defeated_narrative"));
+            output.Add(dragon.GetDefeatedNarrative(messages));
         else
             output.Add(dragon.GetRandomDamageReply(messages));
 

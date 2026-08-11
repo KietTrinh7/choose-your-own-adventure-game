@@ -47,7 +47,7 @@ public class CombatTests
         Combat combat = new Combat(player, dragon, messages);
 
         Assert.AreSame(player, combat.player);
-        Assert.AreSame(dragon, combat.dragon);
+        Assert.AreSame(dragon, combat.monster);
     }
 
     [TestMethod]
@@ -89,7 +89,9 @@ public class CombatTests
 
         StringAssert.Contains(result, messages.GetMessage("combat_stats_header"));
         StringAssert.Contains(result, messages.GetMessage("combat_player_header"));
-        StringAssert.Contains(result, messages.GetMessage("combat_dragon_header"));
+        // The opponent heading is now labelled by the creature's own name, so the
+        // same display works for any monster.
+        StringAssert.Contains(result, string.Format(messages.GetMessage("combat_monster_header"), dragon.Name));
     }
 
     [TestMethod]
