@@ -56,13 +56,52 @@ public class ProfileStore
         return ReadAll().ContainsKey(name);
     }
 
+    // A store that exists but cannot be parsed is renamed aside rather than
+    // overwritten, so its contents survive for anyone who wants to salvage them.
+    // A missing store is the ordinary first run and is not reported.
+    public bool SetAsideUnreadableStore()
+    {
+        if (!File.Exists(StorePath) || CanParseStore())
+            return false;
+
+        string quarantined = StorePath + ".unreadable";
+        int suffix = 1;
+        while (File.Exists(quarantined))
+            quarantined = StorePath + ".unreadable." + suffix++;
+
+        File.Move(StorePath, quarantined);
+        return true;
+    }
+
+    private bool CanParseStore()
+    {
+        try
+        {
+            JsonSerializer.Deserialize<Dictionary<string, Player>>(File.ReadAllText(StorePath));
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
+    }
+
     private Dictionary<string, Player> ReadAll()
     {
         if (!File.Exists(StorePath))
             return new Dictionary<string, Player>();
 
-        string json = File.ReadAllText(StorePath);
-        return JsonSerializer.Deserialize<Dictionary<string, Player>>(json)
-               ?? new Dictionary<string, Player>();
+        try
+        {
+            string json = File.ReadAllText(StorePath);
+            return JsonSerializer.Deserialize<Dictionary<string, Player>>(json)
+                   ?? new Dictionary<string, Player>();
+        }
+        catch (JsonException)
+        {
+            // Reading never throws: a damaged store simply looks empty until
+            // SetAsideUnreadableStore has dealt with it.
+            return new Dictionary<string, Player>();
+        }
     }
 }

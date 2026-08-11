@@ -1,6 +1,6 @@
 # Spec: Save Profiles
 
-Status: ready-for-agent
+Status: done — all three tickets implemented
 
 ## Problem Statement
 

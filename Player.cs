@@ -23,10 +23,12 @@ public class Player
         return Math.Max(0, rawDamage - Armor.Protection);
     }
 
-    public void CreateCharacter(Messages messages)
+    // nameIsTaken lets the caller veto a name that already has a Profile without
+    // this class knowing anything about how Profiles are stored.
+    public void CreateCharacter(Messages messages, Func<string, bool>? nameIsTaken = null)
     {
         Race = PromptForRace(messages);
-        Name = PromptForName(messages);
+        Name = PromptForName(messages, nameIsTaken);
         Occupation = PromptForOccupation(messages);
 
         AssignWeaponByOccupation();
@@ -52,17 +54,43 @@ public class Player
         }
     }
 
-    private string PromptForName(Messages messages)
+    private string PromptForName(Messages messages, Func<string, bool>? nameIsTaken = null)
     {
         while (true)
         {
             Console.WriteLine(messages.GetMessage("name_prompt"));
             string? input = Console.ReadLine()?.Trim();
 
-            if (!string.IsNullOrWhiteSpace(input))
-                return input;
+            if (string.IsNullOrWhiteSpace(input))
+            {
+                Console.WriteLine(messages.GetMessage("name_invalid"));
+                continue;
+            }
 
-            Console.WriteLine(messages.GetMessage("name_invalid"));
+            // Replacing an existing character is a decision, not a gotcha —
+            // same reasoning as the warning before a weapon purchase.
+            if (nameIsTaken != null && nameIsTaken(input))
+            {
+                Console.WriteLine(string.Format(messages.GetMessage("profile_overwrite_warning"), input));
+                if (!ConfirmYes(messages))
+                {
+                    Console.WriteLine(messages.GetMessage("profile_kept"));
+                    continue;
+                }
+            }
+
+            return input;
+        }
+    }
+
+    private bool ConfirmYes(Messages messages)
+    {
+        while (true)
+        {
+            string? answer = Console.ReadLine()?.Trim().ToLower();
+            if (answer == "y") return true;
+            if (answer == "n") return false;
+            Console.WriteLine(messages.GetMessage("invalid"));
         }
     }
 

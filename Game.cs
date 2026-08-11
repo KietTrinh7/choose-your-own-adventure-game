@@ -26,6 +26,11 @@ public class Game
         messages.ReadDictionary();
 
         ProfileStore profiles = new ProfileStore(ProfileStore.DefaultDirectory);
+
+        // A missing store is the ordinary first run and says nothing. A damaged
+        // one is set aside, reported, and never silently overwritten.
+        if (profiles.SetAsideUnreadableStore())
+            Console.WriteLine(messages.GetMessage("store_unreadable"));
         // Display welcome message
         Console.WriteLine();
         Console.WriteLine(messages.GetMessage("welcome"));
@@ -104,7 +109,7 @@ public class Game
         }
 
         Player player = new Player();
-        player.CreateCharacter(messages);
+        player.CreateCharacter(messages, profiles.Exists);
         return player;
     }
 

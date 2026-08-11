@@ -157,4 +157,60 @@ public class ProfileStoreTests
         Assert.IsTrue(store.Exists("Aragorn"));
         Assert.IsFalse(store.Exists("Bilbo"));
     }
+
+    // ── Missing or damaged store ─────────────────────────────────────────────
+
+    [TestMethod]
+    public void MissingStore_HasNoProfilesAndWritesNothing()
+    {
+        string dir = NewTempDir();
+        var store = new ProfileStore(dir);
+
+        Assert.AreEqual(0, store.ListNames().Count);
+        Assert.IsFalse(store.SetAsideUnreadableStore());
+        Assert.AreEqual(0, Directory.GetFiles(dir).Length);
+    }
+
+    [TestMethod]
+    public void UnreadableStore_IsSetAsideWithItsContentsPreserved()
+    {
+        string dir = NewTempDir();
+        File.WriteAllText(Path.Combine(dir, "profiles.json"), "{ this is not json at all");
+        var store = new ProfileStore(dir);
+
+        Assert.IsTrue(store.SetAsideUnreadableStore());
+        Assert.AreEqual(0, store.ListNames().Count);
+
+        string[] leftovers = Directory.GetFiles(dir);
+        Assert.AreEqual(1, leftovers.Length);
+        Assert.IsFalse(leftovers[0].EndsWith("profiles.json"));
+        StringAssert.Contains(File.ReadAllText(leftovers[0]), "this is not json at all");
+    }
+
+    [TestMethod]
+    public void AfterSettingAsideUnreadableStore_TheNextSaveStartsFresh()
+    {
+        string dir = NewTempDir();
+        File.WriteAllText(Path.Combine(dir, "profiles.json"), "not json");
+        var store = new ProfileStore(dir);
+        store.SetAsideUnreadableStore();
+
+        store.Save(CreateFighter("Aragorn"));
+
+        Assert.AreEqual(1, store.ListNames().Count);
+        Assert.AreEqual("Aragorn", store.Load("Aragorn")!.Name);
+    }
+
+    // Reading must never throw, even if the quarantine call was never made.
+    [TestMethod]
+    public void UnreadableStore_ReadsAsEmptyRatherThanThrowing()
+    {
+        string dir = NewTempDir();
+        File.WriteAllText(Path.Combine(dir, "profiles.json"), "{ broken");
+        var store = new ProfileStore(dir);
+
+        Assert.AreEqual(0, store.ListNames().Count);
+        Assert.IsNull(store.Load("Aragorn"));
+        Assert.IsFalse(store.Exists("Aragorn"));
+    }
 }
