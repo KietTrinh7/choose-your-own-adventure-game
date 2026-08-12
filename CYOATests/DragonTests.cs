@@ -213,7 +213,9 @@ public class GamePbi18Tests
 
         Assert.IsNotNull(method, "HandleDragonEncounter method was not found.");
 
-        method!.Invoke(game, new object[] { player, dragon, messages });
+        // Prompting now goes through Prompt. Constructed with console defaults so
+        // it still reads the redirected input this test sets up.
+        method!.Invoke(game, new object[] { player, dragon, messages, new Prompt(messages) });
 
         string output = writer.ToString();
 

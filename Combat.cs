@@ -6,11 +6,14 @@ public class Combat
 
     public bool PlayerRetreated { get; private set; }
 
-    public Combat(Player player, IMonster monster, Messages messages)
+    private readonly Prompt _prompt;
+
+    public Combat(Player player, IMonster monster, Messages messages, Prompt? prompt = null)
     {
         this.player = player;
         this.monster = monster;
         this.messages = messages;
+        _prompt = prompt ?? new Prompt(messages);
         PlayerRetreated = false;
     }
 
@@ -30,20 +33,12 @@ public class Combat
             if (player.HealthPoints <= 0)
                 return false;
 
-            Console.WriteLine(messages.GetMessage("attack_prompt"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
-
-            if (input == "r" || input == "retreat")
+            if (_prompt.AskChoice("attack_prompt", Game.AttackOrRetreat) == "retreat")
             {
                 PlayerRetreated = true;
                 Console.WriteLine(messages.GetMessage("retreat_combat"));
                 return false;
             }
-
-            if (input == "a" || input == "attack")
-                continue;
-
-            Console.WriteLine(messages.GetMessage("invalid"));
         }
     }
 

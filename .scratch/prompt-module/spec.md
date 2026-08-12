@@ -1,6 +1,6 @@
 # Spec: Prompt Module
 
-Status: ready-for-agent
+Status: done — all four tickets implemented
 
 ## Problem Statement
 

@@ -26,6 +26,7 @@ public class Game
         messages.ReadDictionary();
 
         ProfileStore profiles = new ProfileStore(ProfileStore.DefaultDirectory);
+        Prompt prompt = new Prompt(messages);
 
         // A missing store is the ordinary first run and says nothing. A damaged
         // one is set aside, reported, and never silently overwritten.
@@ -40,13 +41,11 @@ public class Game
         bool running = true;
         while (running)
         {
-            Console.WriteLine(messages.GetMessage("menu"));
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? choice = Console.ReadLine()?.Trim();
+            int choice = prompt.AskNumber("menu", 2, "invalid", "enter_choice");
 
-            if (choice == "1")
+            if (choice == 1)
             {
-                Player player = StartOrResumeCharacter(profiles, messages);
+                Player player = StartOrResumeCharacter(profiles, messages, prompt);
 
                 bool inAdventureMenu = true;
                 while (inAdventureMenu)
@@ -55,7 +54,7 @@ public class Game
                     // encounter is ever mid-flight when the Profile is written.
                     profiles.Save(player);
 
-                    string selectedPath = PromptForPath(messages);
+                    string selectedPath = PromptForPath(prompt);
 
                     if (selectedPath == "exit")
                     {
@@ -67,7 +66,7 @@ public class Game
                     {
                         Merchant merchant = new Merchant(die);
                         if (merchant.RollEncounter())
-                            RunMerchantShop(player, merchant, messages);
+                            RunMerchantShop(player, merchant, messages, prompt);
                         else
                             Console.WriteLine(messages.GetMessage("south_path_narrative"));
                     }
@@ -78,7 +77,7 @@ public class Game
                         {
                             Console.WriteLine(messages.GetMessage("east_path_narrative"));
                         }
-                        else if (!HandleWolfEncounter(player, wolf, messages))
+                        else if (!HandleWolfEncounter(player, wolf, messages, prompt))
                         {
                             // Unlike the dragon, only death ends the run here.
                             EndGame(false, false, messages);
@@ -88,34 +87,31 @@ public class Game
                     }
                     else if (selectedPath == "north")
                     {
-                        HandleDragonEncounter(player, dragon, messages);
+                        HandleDragonEncounter(player, dragon, messages, prompt);
 
                         running = false;
                         inAdventureMenu = false;
                     }
                 }
             }
-            else if (choice == "2")
+            else
             {
                 Console.WriteLine(messages.GetMessage("goodbye"));
                 running = false;
-            }
-            else
-            {
-                Console.WriteLine(messages.GetMessage("invalid"));
             }
         }
     }
 
     // Offers Continue only when a Profile exists, so a first-time player sees
     // exactly the flow the game had before Profiles existed.
-    private Player StartOrResumeCharacter(ProfileStore profiles, Messages messages)
+    private Player StartOrResumeCharacter(ProfileStore profiles, Messages messages, Prompt prompt)
     {
         List<string> names = profiles.ListNames();
 
-        if (names.Count > 0 && PlayerChoseContinue(messages))
+        // 2 is Continue on the launch menu.
+        if (names.Count > 0 && prompt.AskNumber("profile_menu", 2, "invalid", "enter_choice") == 2)
         {
-            Player? resumed = PromptForProfile(profiles, names, messages);
+            Player? resumed = PromptForProfile(profiles, names, messages, prompt);
             if (resumed != null)
             {
                 Console.WriteLine(string.Format(messages.GetMessage("profile_resumed"), resumed.Name));
@@ -124,41 +120,18 @@ public class Game
         }
 
         Player player = new Player();
-        player.CreateCharacter(messages, profiles.Exists);
+        player.CreateCharacter(messages, prompt, profiles.Exists);
         return player;
     }
 
-    private bool PlayerChoseContinue(Messages messages)
+    private Player? PromptForProfile(ProfileStore profiles, List<string> names, Messages messages, Prompt prompt)
     {
-        while (true)
-        {
-            Console.WriteLine(messages.GetMessage("profile_menu"));
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim();
+        var lines = new List<string> { messages.GetMessage("profile_select_prompt") };
+        for (int i = 0; i < names.Count; i++)
+            lines.Add(string.Format(messages.GetMessage("profile_option"), i + 1, names[i]));
 
-            if (input == "1") return false;
-            if (input == "2") return true;
-
-            Console.WriteLine(messages.GetMessage("invalid"));
-        }
-    }
-
-    private Player? PromptForProfile(ProfileStore profiles, List<string> names, Messages messages)
-    {
-        while (true)
-        {
-            Console.WriteLine(messages.GetMessage("profile_select_prompt"));
-            for (int i = 0; i < names.Count; i++)
-                Console.WriteLine(string.Format(messages.GetMessage("profile_option"), i + 1, names[i]));
-
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim();
-
-            if (int.TryParse(input, out int choice) && choice >= 1 && choice <= names.Count)
-                return profiles.Load(names[choice - 1]);
-
-            Console.WriteLine(messages.GetMessage("invalid"));
-        }
+        int choice = prompt.AskNumber(lines, names.Count, "invalid", "enter_choice");
+        return profiles.Load(names[choice - 1]);
     }
 
     public void EndGame(bool playerWon, bool playerRetreated, Messages messages)
@@ -189,6 +162,14 @@ public class Game
                trimmed == "e" || trimmed == "exit";
     }
 
+    public static readonly Dictionary<string, string> AttackOrRetreat = new()
+    {
+        ["a"] = "attack",
+        ["attack"] = "attack",
+        ["r"] = "retreat",
+        ["retreat"] = "retreat"
+    };
+
     public bool IsValidCombatChoice(string? input)
     {
         if (string.IsNullOrWhiteSpace(input)) return false;
@@ -197,73 +178,59 @@ public class Game
                trimmed == "r" || trimmed == "retreat";
     }
 
-    private string PromptForPath(Messages messages)
+    // East is the full word only: 'e' is already bound to exit.
+    private static readonly Dictionary<string, string> PathChoices = new()
     {
-        while (true)
-        {
-            Console.WriteLine(messages.GetMessage("path_prompt_full"));
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
+        ["n"] = "north",
+        ["north"] = "north",
+        ["s"] = "south",
+        ["south"] = "south",
+        ["east"] = "east",
+        ["e"] = "exit",
+        ["exit"] = "exit"
+    };
 
-            if (input == "north" || input == "n")
-                return "north";
-
-            if (input == "south" || input == "s")
-                return "south";
-
-            // Checked before exit so the full word wins over the 'e' shortcut.
-            if (input == "east")
-                return "east";
-
-            if (input == "exit" || input == "e")
-                return "exit";
-
-            Console.WriteLine(messages.GetMessage("path_invalid"));
-        }
+    private string PromptForPath(Prompt prompt)
+    {
+        return prompt.AskChoice("path_prompt_full", PathChoices, "path_invalid", "enter_choice");
     }
 
     // Wandering Merchant shop. All shop rules live in Merchant; this loop
     // only reads input and prints localized text (see ADR-0002).
-    private void RunMerchantShop(Player player, Merchant merchant, Messages messages)
+    private void RunMerchantShop(Player player, Merchant merchant, Messages messages, Prompt prompt)
     {
         Console.WriteLine(messages.GetMessage("merchant_appears"));
         Console.WriteLine(messages.GetMessage("merchant_greeting"));
 
         while (true)
         {
-            Console.WriteLine(string.Format(messages.GetMessage("shop_gold"), player.Gold));
-
             // Menu numbers are assigned dynamically so only in-stock items appear.
             var actions = new List<string>();
+            var lines = new List<string> { string.Format(messages.GetMessage("shop_gold"), player.Gold) };
+
             if (merchant.OffersEnchantedSword(player))
             {
                 actions.Add("sword");
-                Console.WriteLine(string.Format(messages.GetMessage("shop_option_sword"), actions.Count));
+                lines.Add(string.Format(messages.GetMessage("shop_option_sword"), actions.Count));
             }
             if (merchant.OffersEnchantedArmor(player))
             {
                 actions.Add("armor");
-                Console.WriteLine(string.Format(messages.GetMessage("shop_option_armor"), actions.Count));
+                lines.Add(string.Format(messages.GetMessage("shop_option_armor"), actions.Count));
             }
             if (merchant.CanSellWeapon(player))
             {
                 actions.Add("sell");
-                Console.WriteLine(string.Format(
+                lines.Add(string.Format(
                     messages.GetMessage("shop_option_sell"),
                     actions.Count,
                     messages.TranslateWeaponForDisplay(player.Weapon!.Type),
                     player.Weapon.MaxDamage));
             }
             actions.Add("leave");
-            Console.WriteLine(string.Format(messages.GetMessage("shop_option_leave"), actions.Count));
+            lines.Add(string.Format(messages.GetMessage("shop_option_leave"), actions.Count));
 
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim();
-            if (!int.TryParse(input, out int choice) || choice < 1 || choice > actions.Count)
-            {
-                Console.WriteLine(messages.GetMessage("shop_invalid"));
-                continue;
-            }
+            int choice = prompt.AskNumber(lines, actions.Count, "shop_invalid", "enter_choice");
 
             string action = actions[choice - 1];
             if (action == "leave")
@@ -284,7 +251,7 @@ public class Game
             {
                 // A weapon purchase discards the current weapon: warn first.
                 string currentWeapon = messages.TranslateWeaponForDisplay(player.Weapon!.Type);
-                if (!AskYesNo(string.Format(messages.GetMessage("weapon_discard_warning"), currentWeapon), messages))
+                if (!prompt.AskYesNo(new[] { string.Format(messages.GetMessage("weapon_discard_warning"), currentWeapon) }))
                 {
                     Console.WriteLine(messages.GetMessage("buy_cancelled"));
                     continue;
@@ -294,7 +261,7 @@ public class Game
             // Optional Haggle before paying: success takes 10 Gold off this
             // item; failure ends the entire encounter (nothing bought).
             int price = Merchant.Price;
-            if (AskYesNo(messages.GetMessage("haggle_prompt"), messages))
+            if (prompt.AskYesNo("haggle_prompt"))
             {
                 bool bargainStruck = merchant.Haggle(player, out int roll);
                 Console.WriteLine(string.Format(messages.GetMessage("haggle_roll"), roll, player.Agility));
@@ -323,18 +290,6 @@ public class Game
         }
     }
 
-    private bool AskYesNo(string prompt, Messages messages)
-    {
-        while (true)
-        {
-            Console.WriteLine(prompt);
-            string? answer = Console.ReadLine()?.Trim().ToLower();
-            if (answer == "y") return true;
-            if (answer == "n") return false;
-            Console.WriteLine(messages.GetMessage("invalid"));
-        }
-    }
-
     private void ReportPurchase(PurchaseOutcome outcome, string itemName, int price, Messages messages)
     {
         if (outcome == PurchaseOutcome.Purchased)
@@ -345,37 +300,25 @@ public class Game
 
     // Returns whether the player walks away. Winning and retreating both put them
     // back on the adventure menu carrying their wounds; only dying ends the run.
-    private bool HandleWolfEncounter(Player player, Wolf wolf, Messages messages)
+    private bool HandleWolfEncounter(Player player, Wolf wolf, Messages messages, Prompt prompt)
     {
         Console.WriteLine(messages.GetMessage("wolf_appears"));
         Console.WriteLine(messages.GetMessage("wolf_stats_intro"));
         wolf.DisplayStats(messages);
 
-        while (true)
+        if (prompt.AskChoice("dragon_encounter_prompt", AttackOrRetreat, "invalid", "enter_choice") == "attack")
         {
-            Console.WriteLine(messages.GetMessage("dragon_encounter_prompt"));
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
-
-            if (input == "a" || input == "attack")
-            {
-                new Combat(player, wolf, messages).StartCombat();
-                return player.HealthPoints > 0;
-            }
-
-            if (input == "r" || input == "retreat")
-            {
-                // Not the dragon's retreat line: that one ends with "The End",
-                // and backing away from a wolf sends you back to the menu.
-                Console.WriteLine(messages.GetMessage("wolf_retreat"));
-                return true;
-            }
-
-            Console.WriteLine(messages.GetMessage("invalid"));
+            new Combat(player, wolf, messages, prompt).StartCombat();
+            return player.HealthPoints > 0;
         }
+
+        // Not the dragon's retreat line: that one ends the run in its wording,
+        // and backing away from a wolf sends you back to the menu.
+        Console.WriteLine(messages.GetMessage("wolf_retreat"));
+        return true;
     }
 
-    private void HandleDragonEncounter(Player player, Dragon dragon, Messages messages)
+    private void HandleDragonEncounter(Player player, Dragon dragon, Messages messages, Prompt prompt)
     {
         Console.WriteLine(messages.GetMessage("north_path_narrative"));
 
@@ -385,36 +328,18 @@ public class Game
 
         Console.WriteLine(messages.GetMessage("dragon_stats_intro"));
         dragon.DisplayStats(messages);
-        while (true)
-        {
-            Console.WriteLine(messages.GetMessage("dragon_encounter_prompt"));
-            Console.Write(messages.GetMessage("enter_choice"));
-            string? input = Console.ReadLine()?.Trim().ToLower();
 
-            if (input == "a" || input == "attack")
-            {
-                Combat combat = new Combat(player, dragon, messages);
-                bool playerWon = combat.StartCombat();
-
-                if (combat.PlayerRetreated)
-                {
-                    return; //combat already handled retreat message
-                }
-                else
-                {
-                   EndGame(playerWon, false, messages); 
-                }
-                
-                return;
-            }
-
-        if (input == "r" || input == "retreat")
+        if (prompt.AskChoice("dragon_encounter_prompt", AttackOrRetreat, "invalid", "enter_choice") == "retreat")
         {
             Console.WriteLine(messages.GetMessage("retreat"));
             return;
         }
 
-        Console.WriteLine(messages.GetMessage("invalid"));
+        Combat combat = new Combat(player, dragon, messages, prompt);
+        bool playerWon = combat.StartCombat();
+
+        // Combat already printed its own retreat message.
+        if (!combat.PlayerRetreated)
+            EndGame(playerWon, false, messages);
     }
-}
 }
