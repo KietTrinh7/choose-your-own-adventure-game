@@ -42,16 +42,6 @@ _Avoid_: Unarmed, bare hands
 The d20 roll made when the player goes South: 16–20 means a Wandering Merchant appears; otherwise the uneventful woods.
 _Avoid_: Spawn chance, random event
 
-### Healing
-
-**Healing Potion**:
-Ordinary merchant stock at 10 Gold, unlike the one-of-a-kind Enchanted Sword and Enchanted Armor. Drunk during combat at the cost of the round's attack, restoring a d10 roll of Health Points. Carried as a count, not an inventory.
-_Avoid_: Elixir, remedy, health pack, consumable
-
-**Maximum Health**:
-The Health Points a character rolled at creation. Healing never passes it and nothing in the game raises it, so a character can be restored but never improved.
-_Avoid_: Max HP, health cap, total health
-
 ### Prompting
 
 **Prompt**:

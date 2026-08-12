@@ -11,7 +11,6 @@ public enum PurchaseOutcome
 public class Merchant
 {
     public const int Price = 30;
-    public const int PotionPrice = 10;
     public const int HaggleDiscount = 10;
     public const string EnchantedSwordType = "enchanted sword";
     public const string EnchantedArmorType = "enchanted armor";
@@ -39,24 +38,6 @@ public class Merchant
     public bool OffersEnchantedArmor(Player player)
     {
         return player.Armor == null;
-    }
-
-    // Ordinary stock rather than one-of-a-kind: always offered, however many the
-    // player already carries. This is the one thing that distinguishes it from
-    // the Enchanted Sword and the Enchanted Armor.
-    public bool OffersHealingPotion(Player player) => true;
-
-    public PurchaseOutcome BuyHealingPotion(Player player) => BuyHealingPotion(player, PotionPrice);
-
-    public PurchaseOutcome BuyHealingPotion(Player player, int price)
-    {
-        if (player.Gold < price)
-            return PurchaseOutcome.InsufficientGold;
-
-        player.Gold -= price;
-        player.HealingPotions++;
-
-        return PurchaseOutcome.Purchased;
     }
 
     public PurchaseOutcome BuyEnchantedSword(Player player)

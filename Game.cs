@@ -227,14 +227,6 @@ public class Game
                     messages.TranslateWeaponForDisplay(player.Weapon!.Type),
                     player.Weapon.MaxDamage));
             }
-            if (merchant.OffersHealingPotion(player))
-            {
-                actions.Add("potion");
-                lines.Add(string.Format(
-                    messages.GetMessage("shop_option_potion"),
-                    actions.Count,
-                    Merchant.PotionPrice));
-            }
             actions.Add("leave");
             lines.Add(string.Format(messages.GetMessage("shop_option_leave"), actions.Count));
 
@@ -268,7 +260,7 @@ public class Game
 
             // Optional Haggle before paying: success takes 10 Gold off this
             // item; failure ends the entire encounter (nothing bought).
-            int price = action == "potion" ? Merchant.PotionPrice : Merchant.Price;
+            int price = Merchant.Price;
             if (prompt.AskYesNo("haggle_prompt"))
             {
                 bool bargainStruck = merchant.Haggle(player, out int roll);
@@ -285,12 +277,7 @@ public class Game
                 }
             }
 
-            if (action == "potion")
-            {
-                PurchaseOutcome outcome = merchant.BuyHealingPotion(player, price);
-                ReportPurchase(outcome, messages.GetMessage("stats_potions").TrimEnd(' ', ':'), price, messages);
-            }
-            else if (action == "sword")
+            if (action == "sword")
             {
                 PurchaseOutcome outcome = merchant.BuyEnchantedSword(player, price);
                 ReportPurchase(outcome, messages.TranslateWeaponForDisplay(Merchant.EnchantedSwordType), price, messages);

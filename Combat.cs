@@ -7,89 +7,39 @@ public class Combat
     public bool PlayerRetreated { get; private set; }
 
     private readonly Prompt _prompt;
-    private readonly Die _die;
 
-    public Combat(Player player, IMonster monster, Messages messages, Prompt? prompt = null, Die? die = null)
+    public Combat(Player player, IMonster monster, Messages messages, Prompt? prompt = null)
     {
         this.player = player;
         this.monster = monster;
         this.messages = messages;
         _prompt = prompt ?? new Prompt(messages);
-        _die = die ?? new Die();
         PlayerRetreated = false;
     }
-
-    public static readonly Dictionary<string, string> AttackDrinkOrRetreat = new()
-    {
-        ["a"] = "attack",
-        ["attack"] = "attack",
-        ["d"] = "drink",
-        ["drink"] = "drink",
-        ["r"] = "retreat",
-        ["retreat"] = "retreat"
-    };
 
     public bool StartCombat()
     {
         Console.WriteLine(GetCombatStatsDisplay());
 
-        bool skipPlayerAttack = false;
-
         while (true)
         {
-            // Drinking last round cost this round's swing. The monster's turn
-            // below still runs, so healing is a trade rather than a free action.
-            if (!skipPlayerAttack)
-            {
-                PlayerAttacksMonsterSequence();
+            PlayerAttacksMonsterSequence();
 
-                if (monster.HealthPoints <= 0)
-                    return true;
-            }
-            skipPlayerAttack = false;
+            if (monster.HealthPoints <= 0)
+                return true;
 
             MonsterAttacksPlayerSequence();
 
             if (player.HealthPoints <= 0)
                 return false;
 
-            // Drinking is only offered when a potion is actually carried, the
-            // same way the shop only lists what is in stock.
-            string chosen = player.HealingPotions > 0
-                ? _prompt.AskChoice("combat_prompt_with_potion", AttackDrinkOrRetreat)
-                : _prompt.AskChoice("attack_prompt", Game.AttackOrRetreat);
-
-            if (chosen == "retreat")
+            if (_prompt.AskChoice("attack_prompt", Game.AttackOrRetreat) == "retreat")
             {
                 PlayerRetreated = true;
                 Console.WriteLine(messages.GetMessage("retreat_combat"));
                 return false;
             }
-
-            if (chosen == "drink")
-                skipPlayerAttack = DrinkSequence();
         }
-    }
-
-    // Returns whether the round was actually spent. A refused drink costs
-    // nothing, so a player at full health does not lose a swing for asking.
-    private bool DrinkSequence()
-    {
-        Player.DrinkOutcome outcome = player.DrinkHealingPotion(_die.Roll(10), out int restored);
-
-        if (outcome == Player.DrinkOutcome.Healed)
-        {
-            Console.WriteLine(string.Format(
-                messages.GetMessage("potion_healed"), restored, player.HealthPoints));
-            return true;
-        }
-
-        Console.WriteLine(messages.GetMessage(
-            outcome == Player.DrinkOutcome.AlreadyAtFullHealth
-                ? "potion_at_full_health"
-                : "potion_none_carried"));
-
-        return false;
     }
 
     public string GetCombatStatsDisplay()

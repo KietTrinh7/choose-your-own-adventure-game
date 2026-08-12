@@ -43,16 +43,7 @@ public class ProfileStore
 
     public Player? Load(string name)
     {
-        if (!ReadAll().TryGetValue(name, out Player? player))
-            return null;
-
-        // Profiles saved before maximum health existed have no value for it, so
-        // it deserialises as zero. Treat the health they were saved with as the
-        // ceiling rather than leaving a character who can never be healed.
-        if (player.MaxHealthPoints <= 0)
-            player.MaxHealthPoints = player.HealthPoints;
-
-        return player;
+        return ReadAll().TryGetValue(name, out Player? player) ? player : null;
     }
 
     public List<string> ListNames()
