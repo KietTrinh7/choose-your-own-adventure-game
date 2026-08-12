@@ -162,6 +162,28 @@ public class GameTests
     }
 
     [TestMethod]
+    public void IsValidPathChoice_ReturnsTrue_ForEast()
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidPathChoice("east"));
+    }
+
+    [TestMethod]
+    public void IsValidPathChoice_ReturnsTrue_ForUppercaseEast()
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidPathChoice("EAST"));
+    }
+
+    // 'e' stays bound to exit; East never took the shortcut.
+    [TestMethod]
+    public void IsValidPathChoice_SingleE_IsStillAccepted()
+    {
+        Game game = new Game();
+        Assert.IsTrue(game.IsValidPathChoice("e"));
+    }
+
+    [TestMethod]
     public void IsValidPathChoice_ReturnsFalse_ForInvalidInput()
     {
         Game game = new Game();

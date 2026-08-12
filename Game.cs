@@ -71,6 +71,21 @@ public class Game
                         else
                             Console.WriteLine(messages.GetMessage("south_path_narrative"));
                     }
+                    else if (selectedPath == "east")
+                    {
+                        Wolf wolf = new Wolf(die);
+                        if (!wolf.RollEncounter())
+                        {
+                            Console.WriteLine(messages.GetMessage("east_path_narrative"));
+                        }
+                        else if (!HandleWolfEncounter(player, wolf, messages))
+                        {
+                            // Unlike the dragon, only death ends the run here.
+                            EndGame(false, false, messages);
+                            running = false;
+                            inAdventureMenu = false;
+                        }
+                    }
                     else if (selectedPath == "north")
                     {
                         HandleDragonEncounter(player, dragon, messages);
@@ -167,8 +182,10 @@ public class Game
     {
         if (string.IsNullOrWhiteSpace(input)) return false;
         string trimmed = input.Trim().ToLower();
+        // East takes the full word only: 'e' is already bound to exit.
         return trimmed == "n" || trimmed == "north" ||
                trimmed == "s" || trimmed == "south" ||
+               trimmed == "east" ||
                trimmed == "e" || trimmed == "exit";
     }
 
@@ -193,6 +210,10 @@ public class Game
 
             if (input == "south" || input == "s")
                 return "south";
+
+            // Checked before exit so the full word wins over the 'e' shortcut.
+            if (input == "east")
+                return "east";
 
             if (input == "exit" || input == "e")
                 return "exit";
@@ -320,6 +341,38 @@ public class Game
             Console.WriteLine(string.Format(messages.GetMessage("buy_success"), price, itemName));
         else if (outcome == PurchaseOutcome.InsufficientGold)
             Console.WriteLine(string.Format(messages.GetMessage("buy_insufficient"), price));
+    }
+
+    // Returns whether the player walks away. Winning and retreating both put them
+    // back on the adventure menu carrying their wounds; only dying ends the run.
+    private bool HandleWolfEncounter(Player player, Wolf wolf, Messages messages)
+    {
+        Console.WriteLine(messages.GetMessage("wolf_appears"));
+        Console.WriteLine(messages.GetMessage("wolf_stats_intro"));
+        wolf.DisplayStats(messages);
+
+        while (true)
+        {
+            Console.WriteLine(messages.GetMessage("dragon_encounter_prompt"));
+            Console.Write(messages.GetMessage("enter_choice"));
+            string? input = Console.ReadLine()?.Trim().ToLower();
+
+            if (input == "a" || input == "attack")
+            {
+                new Combat(player, wolf, messages).StartCombat();
+                return player.HealthPoints > 0;
+            }
+
+            if (input == "r" || input == "retreat")
+            {
+                // Not the dragon's retreat line: that one ends with "The End",
+                // and backing away from a wolf sends you back to the menu.
+                Console.WriteLine(messages.GetMessage("wolf_retreat"));
+                return true;
+            }
+
+            Console.WriteLine(messages.GetMessage("invalid"));
+        }
     }
 
     private void HandleDragonEncounter(Player player, Dragon dragon, Messages messages)

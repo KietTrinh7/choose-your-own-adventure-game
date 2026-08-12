@@ -1,6 +1,6 @@
 # Spec: Wolf Encounter
 
-Status: ready-for-agent
+Status: done — all five tickets implemented
 
 ## Problem Statement
 

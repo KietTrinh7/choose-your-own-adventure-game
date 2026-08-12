@@ -42,6 +42,20 @@ _Avoid_: Unarmed, bare hands
 The d20 roll made when the player goes South: 16–20 means a Wandering Merchant appears; otherwise the uneventful woods.
 _Avoid_: Spawn chance, random event
 
+### Wolf encounter
+
+**Monster**:
+Anything the player can fight. Supplies a name, stats, a weapon, an attack, taunts and its own death line; the combat loop knows nothing else about it. The Dragon and the Wolf are the two that exist.
+_Avoid_: Enemy, creature, mob, NPC
+
+**Wolf**:
+The lone animal on the East path, met on an Encounter Roll. Rolls every stat on a d10 against the Dragon's d20, so it is always the lesser fight. Beating it or fleeing it returns the player to the adventure menu; only dying to it ends the run.
+_Avoid_: Beast, animal, wolves
+
+**Fangs**:
+The Wolf's weapon, MaxDamage 6 against the Dragon's claws at 12.
+_Avoid_: Teeth, bite, jaws
+
 ### Save profiles
 
 **Profile**:
