@@ -10,7 +10,15 @@ public class Player
     public int Agility { get; set; }
     public int HealthPoints { get; set; }
 
+    // The Health Points rolled at creation. Set once, never changed, and the
+    // ceiling healing may not pass. Nothing in the game raises it.
+    public int MaxHealthPoints { get; set; }
+
     public int Gold { get; set; } = 50;
+
+    // A count, not an inventory. Part 3 chose two equipment slots and no
+    // inventory system, and a consumable tally does not reopen that.
+    public int HealingPotions { get; set; }
     public Weapon? Weapon { get; set; }
     public Armor? Armor { get; set; }
 
@@ -25,6 +33,30 @@ public class Player
 
     // nameIsTaken lets the caller veto a name that already has a Profile without
     // this class knowing anything about how Profiles are stored.
+    // What happened when the player tried to drink.
+    public enum DrinkOutcome { Healed, AlreadyAtFullHealth, NonePreparedCarried }
+
+    // Restores the rolled amount, never above the ceiling set at creation. Only
+    // a drink that actually heals consumes a potion. Pure apart from the roll,
+    // which is why it is testable the same way ReduceDamage is.
+    public DrinkOutcome DrinkHealingPotion(int roll, out int restored)
+    {
+        restored = 0;
+
+        if (HealingPotions <= 0)
+            return DrinkOutcome.NonePreparedCarried;
+
+        if (HealthPoints >= MaxHealthPoints)
+            return DrinkOutcome.AlreadyAtFullHealth;
+
+        int before = HealthPoints;
+        HealthPoints = Math.Min(MaxHealthPoints, HealthPoints + roll);
+        restored = HealthPoints - before;
+        HealingPotions--;
+
+        return DrinkOutcome.Healed;
+    }
+
     public void CreateCharacter(Messages messages, Prompt? prompt = null, Func<string, bool>? nameIsTaken = null)
     {
         prompt ??= new Prompt(messages);
@@ -122,6 +154,7 @@ public class Player
     {
         PromptRoll("roll_health", prompt);
         HealthPoints = _die.Roll(20) + strengthModifier;
+        MaxHealthPoints = HealthPoints;
     }
 
     private void PromptForNextAction(Messages messages, Prompt prompt)
@@ -153,6 +186,7 @@ public class Player
 
         Console.WriteLine(messages.GetMessage("stats_gold") + Gold);
         Console.WriteLine(messages.GetMessage("stats_armor") + GetArmorDisplay(messages));
+        Console.WriteLine(messages.GetMessage("stats_potions") + HealingPotions);
     }
 
     public string GetArmorDisplay(Messages messages)
