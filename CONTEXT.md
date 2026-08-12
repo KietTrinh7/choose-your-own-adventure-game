@@ -42,6 +42,12 @@ _Avoid_: Unarmed, bare hands
 The d20 roll made when the player goes South: 16–20 means a Wandering Merchant appears; otherwise the uneventful woods.
 _Avoid_: Spawn chance, random event
 
+### Prompting
+
+**Prompt**:
+Asking the player something and insisting on an acceptable answer. Owns printing the question, reading the line, trimming it, matching it, rejecting what does not fit and asking again. The only place in the game that reads the console.
+_Avoid_: Input handler, reader, console helper
+
 ### Wolf encounter
 
 **Monster**:
